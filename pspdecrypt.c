@@ -2,9 +2,11 @@
 #include <string.h>
 
 #define Kprintf printf
-
 typedef unsigned char u8;
 typedef unsigned int u32;
+
+#include "kl4e.h"
+#include "libLZR.h"
 
 extern int UtilsForKernel_6C6887EE(void *, u32, void *, void *);
 
@@ -1198,56 +1200,20 @@ int pspDecompress(const u8 *inbuf, u8 *outbuf, u32 outcapacity)
 	
 	if (inbuf[0] == 0x1F && inbuf[1] == 0x8B) 
 	{
-		
 		int sceKernelDeflateDecompress(u8 *dest, u32 destSize, u8 *src, u32 unknown);
 		retsize = sceKernelDeflateDecompress(outbuf, outcapacity, inbuf, NULL); // actually gzip
 	}
 	else if (memcmp(inbuf, "2RLZ", 4) == 0) 
 	{
-		puts("ccc2");
-		/*int (*lzrc)(void *outbuf, u32 outcapacity, void *inbuf, void *unk) = NULL;
-		
-		if (sceKernelDevkitVersion() >= 0x03080000)
-		{
-			
-			u32 *mod = (u32 *)sceKernelFindModuleByName("sceNp9660_driver");
-			if (!mod)
-				return -1;
-
-			u32 *code = (u32 *)mod[27];
-
-			int i;
-			
-			for (i = 0; i < 0x8000; i++)
-			{
-				if (code[i] == 0x27bdf4f0 && code[i+20] == 0x34018080)
-				{
-					lzrc = (void *)&code[i];
-					break;
-				} 
-			}
-
-			if (i == 0x8000)
-				return -2;
-			//lzrc = lzrc_;
-		}
-		else
-		{
-			lzrc = (void *)sctrlHENFindFunction("sceSystemMemoryManager", "UtilsForKernel", 0x7DD07271);
-
-		}
-		
-		retsize = lzrc(outbuf, outcapacity, inbuf+4, NULL);*/
+		retsize = LZRDecompress(outbuf, outcapacity, inbuf+4, NULL);
 	}
 	else if (memcmp(inbuf, "KL4E", 4) == 0)
 	{
-		puts("ccc4");
-		//retsize = UtilsForKernel_6C6887EE(outbuf, outcapacity, inbuf+4, NULL);
+		retsize = decompress_kle(outbuf, outcapacity, inbuf+4, NULL, 1);
 	}
 	else if (memcmp(inbuf, "KL3E", 4) == 0) 
 	{
-		puts("ccc3");
-		//retsize = decompress_kle(outbuf, outcapacity, inbuf+4, NULL);
+		retsize = decompress_kle(outbuf, outcapacity, inbuf+4, NULL, 0);
 	}
 	else
 	{
