@@ -3,11 +3,13 @@
 #include <stdarg.h>
 #include <zlib.h>
 
-#define PSAR_BUFFER_SIZE	9400000*4
-char buf[PSAR_BUFFER_SIZE],g_dataOut[PSAR_BUFFER_SIZE],g_dataOut2[PSAR_BUFFER_SIZE];
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+
+#define PSAR_BUFFER_SIZE	9400000*4
+u8 buf[PSAR_BUFFER_SIZE],g_dataOut[PSAR_BUFFER_SIZE],g_dataOut2[PSAR_BUFFER_SIZE];
+
 int iBase, cbChunk, psarVersion;
 int psarPosition;
 int decrypted;
@@ -52,6 +54,11 @@ static char _12g_table[0x4000];
 static int _12gtable_size;
 
 int sceUtilsBufferCopyWithRange(u8* outbuff, int outsize, u8* inbuff, int insize, int cmd);
+int pspDecryptTable(u8 *buf1, u8 *buf2, int size, int mode);
+int pspDecryptPRX(u8 *inbuf, u8 *outbuf, u32 size);
+int pspDecryptIPL1(const u8* pbIn, u8* pbOut, int cbIn);
+int pspLinearizeIPL2(const u8* pbIn, u8* pbOut, int cbIn, u32 *startAddr);
+int pspDecryptIPL3(const u8* pbIn, u8* pbOut, int cbIn);
 
 static int OVERHEAD;
 #define SIZE_A      0x110 /* size of uncompressed file entry = 272 bytes */
@@ -70,12 +77,9 @@ static void Demangle(const u8* pIn, u8* pOut)
     pl[1] = pl[2] = 0;
     pl[3] = 0x55;
     pl[4] = 0x130;
-puts("a");
     sceUtilsBufferCopyWithRange(buffer, 20+0x130, buffer, 20+0x130, 0x7);
-puts("a");
 	if (psarVersion == 5) for ( i = 0; i < 0x130; ++i ) { buffer[i] ^= K2[i & 0xF]; }
     memcpy(pOut, buffer, 0x130);
-puts("a");
 }
 
 static int DecodeBlock(const u8* pIn, int cbIn, u8* pOut)
@@ -102,11 +106,8 @@ static int DecodeBlock(const u8* pIn, int cbIn, u8* pOut)
 	{
 		Demangle(pIn+0x20, pOut+0x20); // demangle the inside $130 bytes
 	}
-printf("%08x\n",*(u32 *)&pOut[0xD0]);
-puts("a");
-//fwrite(pOut,1,2048,stdout);
-
-    if (0)//(*(u32 *)&pOut[0xD0] == 0x0E000000)
+/*
+    if (*(u32 *)&pOut[0xD0] == 0x0E000000)
     {
 		ret = 1;//sceMesgd_driver_102DC8AF(pOut, cbIn, &cbOut);
 	}
@@ -115,9 +116,9 @@ puts("a");
 		ret = 1;//sceNwman_driver_9555D68D(pOut, cbIn, &cbOut);
 	}
 	else
+*/
 	{
 		cbOut = pspDecryptPRX(pOut, pOut, cbIn);
-		//fwrite(pOut,1,2048,stdout);
 		if (cbOut < 0)
 		{
 			printf("Unknown psar tag.\n");
@@ -125,8 +126,7 @@ puts("a");
 		}
 		else
 			return cbOut;
-	}	
-   fwrite(pOut,1,2048,stdout);
+	}
     if (ret != 0)
         return ret; // error
 
@@ -228,17 +228,13 @@ int sceKernelDeflateDecompress(u8 *dest, u32 destSize, u8 *src, u32 unknown)
 	z.zalloc = Z_NULL;
 	z.zfree = Z_NULL;
 	z.opaque = Z_NULL;
-	printf("xxxx %llx\n",inflateInit2_);
     int ret = inflateInit2(&z, 47);
-	puts("oxxxx");
     z.avail_in = PSAR_BUFFER_SIZE;
     z.next_out = dest;
     z.avail_out = destSize;
     z.next_in = src;
-	puts("xxxx");
     ret = inflate(&z, Z_FULL_FLUSH);
     inflateEnd(&z);
-	printf("xxxx %d",ret);
 
     if (ret != Z_STREAM_END) {
         return -1;
@@ -291,19 +287,14 @@ int pspPSARGetNextFile(u8 *dataPSAR, int cbFile, u8 *dataOut, u8 *dataOut2, char
 	if (cbExpanded > 0)
 	{
 		cbOut = DecodeBlock(&dataPSAR[iBase-psarPosition], cbDataChunk, dataOut);
-		printf("@%d@\n",cbOut);
 		if (cbOut > 10 && dataOut[0] == 0x78 && dataOut[1] == 0x9C)
 		{
 			// standard Deflate header
-printf("@aaa@\n");
 			const u8* pbIn = &dataOut[0]; // after header
 			u32 pbEnd;
 			
-			printf("@aaa@ %d\n",cbOut);
 			//insize=cbOut
 			int ret = sceKernelDeflateDecompress(dataOut2, cbExpanded, pbIn, &pbEnd);
-			printf("@aaa@\n");
-			printf("%d %d sss\n",ret,cbExpanded);
 			
 			if (ret == cbExpanded)
 			{
@@ -381,7 +372,7 @@ void ErrorExit(int milisecs, char *fmt, ...)
 	vsprintf(msg, fmt, list);
 	va_end(list);
 
-	printf(msg);
+	puts(msg);
 	
 	//sceKernelDelayThread(milisecs*1000);
 	
@@ -438,7 +429,6 @@ int main(){
     int psar_offs = *(u32*)(buf+0x24);
 	fseek(f, 0, SEEK_END);
 	int cbFile = ftell(f) - psar_offs;
-	printf("%d\n",cbFile);
     fseek(f,psar_offs,SEEK_SET);
     fread(buf,1,cbFile,f);
     if(memcmp(buf,"PSAR",4)){
@@ -488,8 +478,7 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 		int res = pspPSARGetNextFile(buf, cbFile, g_dataOut, g_dataOut2, name, &cbExpanded, &pos, &signcheck);
 		if(res<=0)break;
 		s+=cbExpanded;
-		printf("%d %d %s\n",s,cbExpanded,name);
-
+		//printf("%d %d %s\n",s,cbExpanded,name);
 		
 		if (is5Dnum(name))
 		{
@@ -559,7 +548,7 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 
 				if (!found)
 				{
-					//ErrorExit(5000, "Part 1 Error: cannot find path of %s.\n", name);
+					ErrorExit(5000, "Part 1 Error: cannot find path of %s.\n", name);
 					//printf("Warning: first cannot find path of %s\n", name);
 					//sceKernelDelayThread(2*1000*1000);
 					//error = 0;
@@ -567,7 +556,41 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 				}
 			}
 		}
-		printf("%d %d %s\n",s,cbExpanded,name);
+		else if (!strncmp(name, "com:", 4) && comtable_size > 0)
+		{
+			if (!FindTablePath(com_table, comtable_size, name+4, name))
+			{
+				ErrorExit(5000, "Part 2 Error: cannot find path of %s.\n", name);
+				//printf("Warning: second cannot find path of %s\n", name);
+				//sceKernelDelayThread(2*1000*1000);
+				//error = 0;
+				continue;
+				//ErrorExit(5000, "Error: cannot find path of %s.\n", name);
+			}
+		}
+		else if (!strncmp(name, "01g:", 4) && _1gtable_size > 0)
+		{
+			if (!FindTablePath(_1g_table, _1gtable_size, name+4, name))
+			{
+				ErrorExit(5000, "Error: 01g cannot find path of %s.\n", name);
+			}
+		}
+		else if (!strncmp(name, "02g:", 4) && _2gtable_size > 0)
+		{
+			if (!FindTablePath(_2g_table, _2gtable_size, name+4, name))
+			{
+				ErrorExit(5000, "Error: 01g cannot find path of %s.\n", name);
+			}
+		}
+
+        printf("'%s' ", name);
+
+		char* szFileBase = strrchr(name, '/');
+		
+		if (szFileBase != NULL)
+			szFileBase++;  // after slash
+		else
+			szFileBase = "err.err";
 
 		
 		if (cbExpanded > 0)
@@ -836,25 +859,35 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 			{
 				sprintf(szDataPath, "ms0:/F0/PSARDUMPER/%s", strrchr(name, '/') + 1);
 			}
-					printf("$$$ %s\n",szDataPath);
+			printf("%s,",szDataPath);
 
 			printf("expanded");
-/*
-			if (signcheck && mode == MODE_ENCRYPT_SIGCHECK
-				&& (strcmp(name, "flash0:/kd/loadexec.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_01g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_02g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_03g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_04g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_05g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_06g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_07g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_08g.prx") != 0)
-				&& (strcmp(name, "flash0:/kd/loadexec_09g.prx") != 0))
+
+			if (/*(mode != MODE_DECRYPT) ||*/ (memcmp(g_dataOut2, "~PSP", 4) != 0))
 			{
-				pspSignCheck(g_dataOut2);
+				if (strncmp(name, "ipl:", 4) == 0 && *(u32*)(g_dataOut2 + 0x60) != 1 && *(u32*)(g_dataOut2 + 0x60) != 0x10001)
+				{
+					// IPL Pre-decryption
+					cbExpanded = pspDecryptPRX(g_dataOut2, g_dataOut, cbExpanded);
+
+					if (cbExpanded <= 0)
+					{
+						printf("Warning: cannot pre-decrypt 2000 IPL.\n");
+					}
+					else
+					{
+						memcpy(g_dataOut2, g_dataOut, cbExpanded);
+					}
+				}
+				/*
+				if (WriteFile(szDataPath, g_dataOut2, cbExpanded) != cbExpanded)
+	            {
+					ErrorExit(5000, "Cannot write %s.\n", szDataPath);
+					break;
+				}*/
+	                    
+				printf(",saved");
 			}
-*/
 
 
 			if (memcmp(g_dataOut2, "~PSP", 4) == 0)
@@ -872,13 +905,13 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 					printf(",decrypted");
                             
 					if ((g_dataOut[0] == 0x1F && g_dataOut[1] == 0x8B) ||
-						memcmp(g_dataOut, "2RLZ", 4) == 0 || memcmp(g_dataOut, "KL4E", 4) == 0)
+						memcmp(g_dataOut, "2RLZ", 4) == 0 || memcmp(g_dataOut, "KL4E", 4) == 0 || memcmp(g_dataOut, "KL3E", 4) == 0)
 					{
 						int cbExp = pspDecompress(g_dataOut, g_dataOut2, sizeof(g_dataOut));
 						
 						if (cbExp > 0)
 						{
-							printf(",decompressed[%d]",cbExp);
+							printf(",decompressed",cbExp);
 							pbToSave = g_dataOut2;
 							cbToSave = cbExp;
 						}
@@ -898,29 +931,39 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 				}
 				else
 				{
-					
-					printf(",not decrypted.\n");
+					printf(",not decrypted.");
 					
 				}
 			}
-/*
-			else if (strncmp(name, "ipl:", 4) == 0)
+#if 0
+			//else if (strncmp(name, "ipl:", 4) == 0)
+			else if (strncmp(name, "ipl:/nandipl_01g", 16) == 0 || strncmp(name, "ipl:/nandipl_02g", 16) == 0)
 			{
 				sprintf(szDataPath, "ms0:/F0/PSARDUMPER/part1_%s", szFileBase);
 
 				int cb1 = pspDecryptIPL1(g_dataOut2, g_dataOut, cbExpanded);
-				if (cb1 > 0 && (WriteFile(szDataPath, g_dataOut, cb1) == cb1))
+
+				if (cb1 > 0/* && (WriteFile(szDataPath, g_dataOut, cb1) == cb1)*/)
 				{
-					int cb2 = pspLinearizeIPL2(g_dataOut, g_dataOut2, cb1);
+					u32 startAddr = 0;
+					int cb2 = pspLinearizeIPL2(g_dataOut, g_dataOut2, cb1, &startAddr);
+					u32 offs = 0x04100000 - startAddr;
+					printf("%x\n",offs);
 					sprintf(szDataPath, "ms0:/F0/PSARDUMPER/part2_%s", szFileBase);
 					
-					WriteFile(szDataPath, g_dataOut2, cb2);
+					//WriteFile(szDataPath, g_dataOut2, cb2);
 					
-					int cb3 = pspDecryptIPL3(g_dataOut2, g_dataOut, cb2);
+					int cb3 = pspDecryptIPL3(g_dataOut2+offs, g_dataOut, cb2-offs);
 					sprintf(szDataPath, "ms0:/F0/PSARDUMPER/part3_%s", szFileBase);
-					WriteFile(szDataPath, g_dataOut, cb3);
+					//WriteFile(szDataPath, g_dataOut, cb3);
 				}
-			}*/
+			}
+#endif
 		}
+		else if (cbExpanded == 0)
+		{
+			printf("empty");
+		}
+		printf("\n");
 	}
 }

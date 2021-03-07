@@ -7,8 +7,7 @@ typedef unsigned int u32;
 
 #include "kl4e.h"
 #include "libLZR.h"
-
-extern int UtilsForKernel_6C6887EE(void *, u32, void *, void *);
+int sceUtilsBufferCopyWithRange(u8* outbuff, int outsize, u8* inbuff, int insize, int cmd);
 
 ////////// Decryption 1 //////////
 
@@ -143,7 +142,7 @@ typedef struct
     u8 codeExtra;
 } TAG_INFO;
 
-static const TAG_INFO g_tagInfo[] =
+static TAG_INFO g_tagInfo[] =
 {
     // 1.x PRXs
     { 0x00000000, (u8*)g_key0, 0x42 },
@@ -442,7 +441,7 @@ typedef struct
 	u8 type;
 } TAG_INFO2;
 
-static const TAG_INFO2 g_tagInfo2[] =
+static TAG_INFO2 g_tagInfo2[] =
 {
 	{ 0x4C9494F0, keys660_k1, 0x43}, // 6.60 
 	{ 0x4C9495F0, keys660_k2, 0x43}, // 6.60 02g
@@ -919,7 +918,7 @@ int pspDecryptIPL1(const u8* pbIn, u8* pbOut, int cbIn)
     return cbOut;
 }
 
-int pspLinearizeIPL2(const u8* pbIn, u8* pbOut, int cbIn)
+int pspLinearizeIPL2(const u8* pbIn, u8* pbOut, int cbIn, u32 *startAddr)
 {
     //int k1 = pspSdkSetK1(0);
 	
@@ -935,6 +934,9 @@ int pspLinearizeIPL2(const u8* pbIn, u8* pbOut, int cbIn)
             //pspSdkSetK1(k1);
 			return 0;   // error
 		}
+        if (nextAddr == 0) {
+            *startAddr = addr;
+        }
 
         u32 count = pl[1];
         nextAddr = addr + count;
@@ -955,8 +957,8 @@ int pspDecryptIPL3(const u8* pbIn, u8* pbOut, int cbIn)
 	int ret;
 	
 	// all together now (pbIn/pbOut must be aligned)
-    pbIn += 0x10000;
-    cbIn -= 0x10000;
+    //pbIn += 0x10000;
+    //cbIn -= 0x10000;
 	memcpy(pbOut+0x40, pbIn, cbIn);
 	//logbuffer(pbOut+0x40, cbIn);
 	ret = sceUtilsBufferCopyWithRange(pbOut, cbIn+0x40, pbOut+0x40, cbIn, 1);
@@ -974,32 +976,6 @@ int pspDecryptIPL3(const u8* pbIn, u8* pbOut, int cbIn)
 }
 
 ////////// Decompression //////////
-
-int pspIsCompressed(u8 *buf)
-{
-	//int k1 = pspSdkSetK1(0);
-	int res = 0;
-
-	if (buf[0] == 0x1F && buf[1] == 0x8B)
-		res = 1;
-	else if (memcmp(buf, "2RLZ", 4) == 0)
-		res = 1;
-
-	//pspSdkSetK1(k1);
-	return res;
-}
-
-/*
-int decompress_kle(void *outbuf, u32 outcapacity, void *inbuf, void *unk)
-{
-	int (* decompress)(void *, u32, void *, void *);
-	
-	u32 *mod = (u32 *)sceKernelFindModuleByName("sceLoadExec");
-	u32 text_addr = *(mod+27);
-	decompress = (void *)(text_addr+0);
-
-	return decompress(outbuf, outcapacity, inbuf, unk);
-}*/
 
 int pspDecompress(const u8 *inbuf, u8 *outbuf, u32 outcapacity)
 {
@@ -1458,17 +1434,10 @@ int pspDecryptTable(u8 *buf1, u8 *buf2, int size, int mode)
 	{
 		retsize = DecryptPRX2(buf2, buf1, size, 0xD8231EF0);		
 	}
-	else{
-	retsize = pspDecryptPRX(buf2, buf1, size);
-	if (retsize < 0)
+	else
 	{
-		printf("bbb %x\n",(*(u32 *)&buf2[0xD0]));
-		/*int res = sceMesgd_driver_102DC8AF(buf1, size, &retsize);
-		if (res < 0)
-		{
-			retsize = -1;				
-		}*/
-	}}
+	    retsize = pspDecryptPRX(buf2, buf1, size);
+	}
 
 	return retsize;
 }
