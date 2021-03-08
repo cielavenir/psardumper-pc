@@ -363,6 +363,38 @@ static char *GetVersion(char *buf)
 	return p+1;
 }
 
+int makedir(const char *_dir){
+	if(!_dir||!*_dir)return -1;
+	char *dir=(char*)_dir; //unsafe, but OK
+	int l=strlen(dir),i=0,ret=0;
+	for(;i<l;i++){
+		int c=dir[i];
+		if(c=='\\'||c=='/'){
+			dir[i]=0;
+#if defined(_WIN32) || (!defined(__GNUC__) && !defined(__clang__))
+			ret=mkdir(dir);
+#else
+			ret=mkdir(dir,0755);
+#endif
+			dir[i]=c;
+		}
+	}
+	return ret;
+}
+
+static int WriteFile(const char *szDataPath, u8 *pbToSave, int cbToSave)
+{
+	if(!strncmp(szDataPath,"ms0:/",5)){
+		const char *szRelDataPath = szDataPath+5;
+		makedir(szRelDataPath);
+		FILE *f = fopen(szRelDataPath, "wb");
+		int r = fwrite(pbToSave, 1, cbToSave, f);
+		fclose(f);
+		return r;
+	}
+	return -1;
+}
+
 void ErrorExit(int milisecs, char *fmt, ...)
 {
 	va_list list;
@@ -859,6 +891,15 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 			{
 				sprintf(szDataPath, "ms0:/F0/PSARDUMPER/%s", strrchr(name, '/') + 1);
 			}
+
+#if 0
+			//select file
+			int i=0;
+			for(;i<argc;i++)
+				if(!strcmp(szDataPath,argv[2*i])){strcpy(szDataPath,argv[2*i+1]);break;}
+			if(i==argc){error=0;continue;}
+#endif
+			
 			printf("%s,",szDataPath);
 
 			printf("expanded");
@@ -879,12 +920,12 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 						memcpy(g_dataOut2, g_dataOut, cbExpanded);
 					}
 				}
-				/*
+
 				if (WriteFile(szDataPath, g_dataOut2, cbExpanded) != cbExpanded)
 	            {
 					ErrorExit(5000, "Cannot write %s.\n", szDataPath);
 					break;
-				}*/
+				}
 	                    
 				printf(",saved");
 			}
@@ -922,10 +963,10 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 						}
 					}
         			
-					/*if (WriteFile(szDataPath, pbToSave, cbToSave) != cbToSave)
+					if (WriteFile(szDataPath, pbToSave, cbToSave) != cbToSave)
 					{
 						ErrorExit(5000, "Error writing %s.\n", szDataPath);
-					}*/
+					}
                     
 					printf(",saved!");
 				}
@@ -935,7 +976,7 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 					
 				}
 			}
-#if 0
+
 			//else if (strncmp(name, "ipl:", 4) == 0)
 			else if (strncmp(name, "ipl:/nandipl_01g", 16) == 0 || strncmp(name, "ipl:/nandipl_02g", 16) == 0)
 			{
@@ -943,7 +984,7 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 
 				int cb1 = pspDecryptIPL1(g_dataOut2, g_dataOut, cbExpanded);
 
-				if (cb1 > 0/* && (WriteFile(szDataPath, g_dataOut, cb1) == cb1)*/)
+				if (cb1 > 0 && (WriteFile(szDataPath, g_dataOut, cb1) == cb1))
 				{
 					u32 startAddr = 0;
 					int cb2 = pspLinearizeIPL2(g_dataOut, g_dataOut2, cb1, &startAddr);
@@ -951,14 +992,14 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 					printf("%x\n",offs);
 					sprintf(szDataPath, "ms0:/F0/PSARDUMPER/part2_%s", szFileBase);
 					
-					//WriteFile(szDataPath, g_dataOut2, cb2);
-					
+					WriteFile(szDataPath, g_dataOut2, cb2);
+#if 0
 					int cb3 = pspDecryptIPL3(g_dataOut2+offs, g_dataOut, cb2-offs);
 					sprintf(szDataPath, "ms0:/F0/PSARDUMPER/part3_%s", szFileBase);
-					//WriteFile(szDataPath, g_dataOut, cb3);
+					WriteFile(szDataPath, g_dataOut, cb3);
+#endif
 				}
 			}
-#endif
 		}
 		else if (cbExpanded == 0)
 		{
