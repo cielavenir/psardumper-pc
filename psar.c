@@ -489,9 +489,13 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 	{
 		table_mode = 4;
 	}
-    else if ((memcmp(version, "6.", 2) == 0) && (psarVersion == 5))
+    else if ((memcmp(version, "6.6", 3) == 0) && (psarVersion == 5))
 	{
 		table_mode = 4;
+	}
+    else if ((memcmp(version, "6.", 2) == 0) && (psarVersion == 5)) // 6.10/6.20 PSPgo
+	{
+		table_mode = 5;
 	}
     else if (memcmp(version, "6.", 2) == 0)
 	{
