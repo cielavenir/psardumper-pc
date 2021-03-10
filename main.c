@@ -1,4 +1,4 @@
-#define argc(a) (sizeof(a)/sizeof(a[0]))
+#define argc(a) (sizeof(a)/sizeof(a[0])/2)
 int Expand(char *pbp, int argc, char **argv);
 
 int main(int _, char **argv){

@@ -137,7 +137,8 @@ int pspPSARInit(u8 *dataPSAR, u8 *dataOut, u8 *dataOut2)
 {
 
 //initialize global vars
-//iBase=cbChunk=psarPosition=decrypted=0;
+iBase=cbChunk=psarPosition=decrypted=0;
+comtable_size=_1gtable_size=_2gtable_size=_3gtable_size=_4gtable_size=_5gtable_size=_6gtable_size=_7gtable_size=_8gtable_size=_9gtable_size=_10gtable_size=_11gtable_size=_12gtable_size=0;
 
 	if (memcmp(dataPSAR, "PSAR", 4) != 0)
     {
@@ -239,7 +240,7 @@ int sceKernelDeflateDecompress(u8 *dest, u32 destSize, u8 *src, u32 unknown)
     if (ret != Z_STREAM_END) {
         return -1;
     } else {
-        return destSize;
+        return destSize-z.avail_out;
     }
 }
 
