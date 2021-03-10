@@ -454,9 +454,9 @@ static int FindTablePath(char *table, int table_size, char *number, char *szOut)
 	return 0;
 }
 
-int main(){
+int Expand(char *pbp, int argc, char **argv){
     kirk_init();
-    FILE *f=fopen("661.PBP","rb");
+    FILE *f=fopen(pbp,"rb");
     fread(buf,1,0x28,f);
     int psar_offs = *(u32*)(buf+0x24);
 	fseek(f, 0, SEEK_END);
@@ -896,13 +896,16 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 				sprintf(szDataPath, "ms0:/F0/PSARDUMPER/%s", strrchr(name, '/') + 1);
 			}
 
-#if 0
+			if(argv){
 			//select file
 			int i=0;
 			for(;i<argc;i++)
 				if(!strcmp(szDataPath,argv[2*i])){strcpy(szDataPath,argv[2*i+1]);break;}
-			if(i==argc){error=0;continue;}
-#endif
+			if(i==argc){
+				//error=0;
+				continue;
+			}
+			}
 			
 			printf("%s,",szDataPath);
 

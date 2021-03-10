@@ -1,6 +1,8 @@
+#define argc(a) (sizeof(a)/sizeof(a[0]))
 int Expand(char *pbp, int argc, char **argv);
 
-int main(){
+int main(int _, char **argv){
+#ifdef POPSDECO
 	{	char *p401[]={
 			"ms0:/F0/kd/impose.prx","ms0:/seplugins/popsloader/modules/impose.prx",
 			"ms0:/F0/kd/resource/impose.rsc","ms0:/seplugins/popsloader/modules/impose.rsc",
@@ -367,6 +369,8 @@ int main(){
 			"ms0:/F0/vsh/module/pafmini.prx","ms0:/seplugins/popsloader/modules/661/pafmini.prx",
 			"ms0:/F0/vsh/module/libpspvmc.prx","ms0:/seplugins/popsloader/modules/661/libpspvmc.prx",
 		}; Expand("661-GO.PBP",argc(p661go),p661go);}
-
+#else
+Expand(argv[1],0,(void*)0);
+#endif
     return 0;
 }
