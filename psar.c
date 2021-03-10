@@ -620,8 +620,6 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 			}
 		}
 
-        printf("'%s' ", name);
-
 		char* szFileBase = strrchr(name, '/');
 		
 		if (szFileBase != NULL)
@@ -907,7 +905,9 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 				continue;
 			}
 			}
-			
+
+            printf("'%s' ", name);
+
 			printf("%s,",szDataPath);
 
 			printf("expanded");
@@ -1008,11 +1008,15 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 #endif
 				}
 			}
+			printf("\n");
 		}
 		else if (cbExpanded == 0)
 		{
+			if(!argv){
 			printf("empty");
+			printf("\n");
+			}
 		}
-		printf("\n");
+		
 	}
 }
