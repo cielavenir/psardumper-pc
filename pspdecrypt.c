@@ -698,7 +698,7 @@ static int DecryptPRX2(const u8 *inbuf, u8 *outbuf, u32 size, u32 tag)
 	if (memcmp(outbuf, tmp3, 0x14) != 0)
 	{
 		Kprintf("SHA-1 is incorrect.\n");
-        return -8;
+        //return -8;
 	}
 	
 	int iXOR;
