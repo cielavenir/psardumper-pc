@@ -766,6 +766,20 @@ int pspDecryptPRX(u8 *inbuf, u8 *outbuf, u32 size)
 	return retsize;
 }
 
+int sceMesgd_driver_102DC8AF(u8 *inoutbuf, u32 size, u32 *outsize){
+	int cbOut = pspDecryptPRX(inoutbuf, inoutbuf, size);
+	if(cbOut<0)return 1;
+	if(outsize)*outsize = cbOut;
+	return 0;
+}
+
+int sceNwman_driver_9555D68D(u8 *inoutbuf, u32 size, u32 *outsize){
+	int cbOut = pspDecryptPRX(inoutbuf, inoutbuf, size);
+	if(cbOut<0)return 1;
+	if(outsize)*outsize = cbOut;
+	return 0;
+}
+
 ////////// SignCheck //////////
 
 u8 check_keys0[0x10] =

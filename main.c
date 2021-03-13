@@ -1,5 +1,6 @@
 #define argc(a) (sizeof(a)/sizeof(a[0])/2)
 int Expand(char *pbp, int argc, char **argv);
+void ExtractReboot(char *loadexec, char *reboot, char *rebootname);
 
 int main(int _, char **argv){
 #if defined(POPSDECO)
@@ -418,7 +419,20 @@ int main(int _, char **argv){
 				"ms0:/F0/kd/resource/meimg.img","ms0:/TM/DC8/6xxModules/meimg.img",
 			}; Expand(prome_pbpname,argc(pPROME),pPROME);}
 #else
-Expand(argv[1],0,(void*)0);
+	Expand(argv[1],0,(void*)0);
+	ExtractReboot("F0/kd/loadexec.prx", "ms0:/F0/reboot.bin", "ms0:/F0/reboot.bin");
+	ExtractReboot("F0/kd/loadexec_01g.prx", "ms0:/F0/reboot.bin", "ms0:/F0/reboot.bin");
+	ExtractReboot("F0/kd/loadexec_02g.prx", "ms0:/F0/reboot_02g.bin", "ms0:/F0/reboot_02g.bin");
+	ExtractReboot("F0/kd/loadexec_03g.prx", "ms0:/F0/reboot_03g.bin", "ms0:/F0/reboot_03g.bin");
+	ExtractReboot("F0/kd/loadexec_04g.prx", "ms0:/F0/reboot_04g.bin", "ms0:/F0/reboot_04g.bin");
+	ExtractReboot("F0/kd/loadexec_05g.prx", "ms0:/F0/reboot_05g.bin", "ms0:/F0/reboot_05g.bin");
+	ExtractReboot("F0/kd/loadexec_06g.prx", "ms0:/F0/reboot_06g.bin", "ms0:/F0/reboot_06g.bin");
+	ExtractReboot("F0/kd/loadexec_07g.prx", "ms0:/F0/reboot_07g.bin", "ms0:/F0/reboot_07g.bin");
+	ExtractReboot("F0/kd/loadexec_08g.prx", "ms0:/F0/reboot_08g.bin", "ms0:/F0/reboot_08g.bin");
+	ExtractReboot("F0/kd/loadexec_09g.prx", "ms0:/F0/reboot_09g.bin", "ms0:/F0/reboot_09g.bin");
+	ExtractReboot("F0/kd/loadexec_10g.prx", "ms0:/F0/reboot_10g.bin", "ms0:/F0/reboot_10g.bin");
+	ExtractReboot("F0/kd/loadexec_11g.prx", "ms0:/F0/reboot_11g.bin", "ms0:/F0/reboot_11g.bin");
+	ExtractReboot("F0/kd/loadexec_12g.prx", "ms0:/F0/reboot_12g.bin", "ms0:/F0/reboot_12g.bin");
 #endif
     return 0;
 }
