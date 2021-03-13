@@ -513,6 +513,7 @@ typedef struct
     const u8 *key; // 16 bytes keys
     u8 code; // code for scramble
 	u8 type;
+	const u8 *bonusSeed;
 } TAG_INFO2;
 
 static TAG_INFO2 g_tagInfo2[] =
@@ -729,6 +730,12 @@ static int DecryptPRX2(const u8 *inbuf, u8 *outbuf, u32 size, u32 tag)
 		return -5;
 	}
 
+	if(pti->bonusSeed){
+		for (i = 0; i < 0x90; i++){
+			p[i] ^= pti->bonusSeed[i%0x10];
+		}
+	}
+
 	memcpy(outbuf, tmp1+0xD0, 0x5C);
 	memcpy(outbuf+0x5C, tmp1+0x140, 0x10);
 	memcpy(outbuf+0x6C, tmp1+0x12C, 0x14);
@@ -811,9 +818,11 @@ static int DecryptPRX2(const u8 *inbuf, u8 *outbuf, u32 size, u32 tag)
 
 	// The real decryption
 	//logbuffer(outbuf+0x40, size-0x40);
-	if (sceUtilsBufferCopyWithRange(outbuf, size, outbuf+0x40, size-0x40, 0x1) != 0)
+	int ret = 0;
+	if ((ret=sceUtilsBufferCopyWithRange(outbuf, size, outbuf+0x40, size-0x40, 0x1)) != 0)
 	{
-		Kprintf("Error in sceUtilsBufferCopyWithRange 0x1.\n");
+		//Kprintf("Error in sceUtilsBufferCopyWithRange 0x1.\n");
+		Kprintf("mangle#1 returned $%x\n", ret);
 		return -1;
 	}
 

@@ -561,21 +561,24 @@ static int FindTablePath(char *table, int table_size, char *number, char *szOut)
 	return 0;
 }
 
-int Expand(char *pbp, int argc, char **argv){
+int Expand(char *pbp, int argc, char **argv, int isPBP){
 	kirk_init();
 	FILE *f=fopen(pbp,"rb");
 	if(!f){
-		printf("cannot open %s", pbp);
+		printf("cannot open %s\n", pbp);
 		return 1;
 	}
-	fread(buf,1,0x28,f);
-	int psar_offs = *(u32*)(buf+0x24);
+	int psar_offs = 0;
+	if(isPBP){
+		fread(buf,1,0x28,f);
+		psar_offs = *(u32*)(buf+0x24);
+	}
 	fseek(f, 0, SEEK_END);
 	int cbFile = ftell(f) - psar_offs;
 	fseek(f,psar_offs,SEEK_SET);
 	fread(buf,1,cbFile,f);
 	if(memcmp(buf,"PSAR",4)){
-		printf("not psar");
+		printf("not psar\n");
 		return 1;
 	}
 	int table_mode;
@@ -1132,4 +1135,48 @@ int Expand(char *pbp, int argc, char **argv){
 		}
 	}
 	return 0;
+}
+
+int decPSP(const char *pbp, int isPBP){
+	kirk_init();
+	FILE *f=fopen(pbp,"rb");
+	if(!f){
+		printf("cannot open %s\n", pbp);
+		return 1;
+	}
+	printf("Decrypting %s\n", pbp);
+	int psp_offs = 0, cbFile = 0;
+	if(isPBP){
+		fread(buf,1,0x28,f);
+		psp_offs = *(u32*)(buf+0x20);
+		cbFile = *(u32*)(buf+0x24) - psp_offs;
+	}else{
+		fseek(f, 0, SEEK_END);
+		cbFile = ftell(f) - psp_offs;
+	}
+	fseek(f,psp_offs,SEEK_SET);
+	fread(g_dataOut2,1,cbFile,f);
+	if(1){
+		int cbDecrypted = pspDecryptPRX(g_dataOut2, g_dataOut, cbFile);
+		if(cbDecrypted>0){
+		if ((g_dataOut[0] == 0x1F && g_dataOut[1] == 0x8B) ||
+			memcmp(g_dataOut, "2RLZ", 4) == 0 || memcmp(g_dataOut, "KL4E", 4) == 0 || memcmp(g_dataOut, "KL3E", 4) == 0)
+		{
+			int cbExp = pspDecompress(g_dataOut, g_dataOut2, sizeof(g_dataOut));
+			
+			if (cbExp > 0)
+			{
+				WriteFile("ms0:/dec.prx", g_dataOut2, cbExp);
+			}
+			else
+			{
+				WriteFile("ms0:/dec.prx", g_dataOut, cbDecrypted);
+			}
+		}else{
+			WriteFile("ms0:/dec.prx", g_dataOut, cbDecrypted);
+		}
+		}else{
+			WriteFile("ms0:/dec.prx", g_dataOut2, cbFile);
+		}
+	}
 }
