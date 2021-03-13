@@ -2,7 +2,7 @@
 int Expand(char *pbp, int argc, char **argv);
 
 int main(int _, char **argv){
-#ifdef POPSDECO
+#if defined(POPSDECO)
 	{	char *p401[]={
 			"ms0:/F0/kd/impose.prx","ms0:/seplugins/popsloader/modules/impose.prx",
 			"ms0:/F0/kd/resource/impose.rsc","ms0:/seplugins/popsloader/modules/impose.rsc",
@@ -369,6 +369,54 @@ int main(int _, char **argv){
 			"ms0:/F0/vsh/module/pafmini.prx","ms0:/seplugins/popsloader/modules/661/pafmini.prx",
 			"ms0:/F0/vsh/module/libpspvmc.prx","ms0:/seplugins/popsloader/modules/661/libpspvmc.prx",
 		}; Expand("661-GO.PBP",argc(p661go),p661go);}
+#elif defined(DC8EX)
+		//const char *music_pbpname="550.PBP";
+		const char *music_pbpname="551.PBP";
+		{	char *pMUSIC[]={
+				"ms0:/F0/vsh/module/content_browser.prx","ms0:/TM/DC8/vsh/module/content_browser.prx",
+				"ms0:/F0/vsh/module/mp4msv.prx","ms0:/TM/DC8/vsh/module/mp4msv.prx",
+				"ms0:/F0/vsh/module/msvideo_main_plugin.prx","ms0:/TM/DC8/vsh/module/msvideo_main_plugin.prx",
+				"ms0:/F0/vsh/module/msvideo_plugin.prx","ms0:/TM/DC8/vsh/module/msvideo_plugin.prx",
+				"ms0:/F0/vsh/module/music_browser.prx","ms0:/TM/DC8/vsh/module/music_browser.prx",
+				"ms0:/F0/vsh/module/music_main_plugin.prx","ms0:/TM/DC8/vsh/module/music_main_plugin.prx",
+				"ms0:/F0/vsh/module/music_parser.prx","ms0:/TM/DC8/vsh/module/music_parser.prx",
+				"ms0:/F0/vsh/module/music_player.prx","ms0:/TM/DC8/vsh/module/music_player.prx",
+				"ms0:/F0/vsh/module/photo_browser.prx","ms0:/TM/DC8/vsh/module/photo_browser.prx",
+				"ms0:/F0/vsh/module/photo_main_plugin.prx","ms0:/TM/DC8/vsh/module/photo_main_plugin.prx",
+				"ms0:/F0/vsh/module/photo_player.prx","ms0:/TM/DC8/vsh/module/photo_player.prx",
+				"ms0:/F0/vsh/module/video_main_plugin.prx","ms0:/TM/DC8/vsh/module/video_main_plugin.prx",
+				"ms0:/F0/vsh/module/video_plugin.prx","ms0:/TM/DC8/vsh/module/video_plugin.prx",
+				"ms0:/F0/vsh/module/visualizer_plugin.prx","ms0:/TM/DC8/vsh/module/visualizer_plugin.prx",
+				"ms0:/F0/vsh/resource/content_browser_plugin.rco","ms0:/TM/DC8/vsh/resource/content_browser_plugin.rco",
+				"ms0:/F0/vsh/resource/msvideo_main_plugin.rco","ms0:/TM/DC8/vsh/resource/msvideo_main_plugin.rco",
+				"ms0:/F0/vsh/resource/music_browser_plugin.rco","ms0:/TM/DC8/vsh/resource/music_browser_plugin.rco",
+				"ms0:/F0/vsh/resource/music_player_plugin.rco","ms0:/TM/DC8/vsh/resource/music_player_plugin.rco",
+				"ms0:/F0/vsh/resource/photo_browser_plugin.rco","ms0:/TM/DC8/vsh/resource/photo_browser_plugin.rco",
+				"ms0:/F0/vsh/resource/photo_player_plugin.rco","ms0:/TM/DC8/vsh/resource/photo_player_plugin.rco",
+				"ms0:/F0/vsh/resource/video_main_plugin.rco","ms0:/TM/DC8/vsh/resource/video_main_plugin.rco",
+				"ms0:/F0/vsh/resource/video_plugin_videotoolbar.rco","ms0:/TM/DC8/vsh/resource/video_plugin_videotoolbar.rco",
+				"ms0:/F0/vsh/resource/visualizer_plugin.rco","ms0:/TM/DC8/vsh/resource/visualizer_plugin.rco",
+			}; Expand(music_pbpname,argc(pMUSIC),pMUSIC);}
+		//const char *prome_pbpname="631.PBP";
+		const char *prome_pbpname="635.PBP";
+		{	char *pPROME[]={
+				"ms0:/F0/kd/audiocodec_260.prx","ms0:/TM/DC8/6xxModules/audiocodec_260.prx",
+				"ms0:/F0/kd/avcodec.prx","ms0:/TM/DC8/6xxModules/avcodec.prx",
+				"ms0:/F0/kd/g729.prx","ms0:/TM/DC8/6xxModules/g729.prx",
+				"ms0:/F0/kd/libaac.prx","ms0:/TM/DC8/6xxModules/libaac.prx",
+				"ms0:/F0/kd/libatrac3plus.prx","ms0:/TM/DC8/6xxModules/libatrac3plus.prx",
+				"ms0:/F0/kd/libmp3.prx","ms0:/TM/DC8/6xxModules/libmp3.prx",
+				"ms0:/F0/kd/libmp4.prx","ms0:/TM/DC8/6xxModules/libmp4.prx",
+				"ms0:/F0/kd/me_wrapper.prx","ms0:/TM/DC8/6xxModules/me_wrapper.prx",
+				"ms0:/F0/kd/mp4msv.prx","ms0:/TM/DC8/6xxModules/mp4msv.prx",
+				"ms0:/F0/kd/mpeg.prx","ms0:/TM/DC8/6xxModules/mpeg.prx",
+				"ms0:/F0/kd/mpegbase_260.prx","ms0:/TM/DC8/6xxModules/mpegbase_260.prx",
+				"ms0:/F0/kd/sc_sascore.prx","ms0:/TM/DC8/6xxModules/sc_sascore.prx",
+				"ms0:/F0/kd/vaudio.prx","ms0:/TM/DC8/6xxModules/vaudio.prx",
+				"ms0:/F0/kd/videocodec_260.prx","ms0:/TM/DC8/6xxModules/videocodec_260.prx",
+				"ms0:/F0/kd/resource/me_t2img.img","ms0:/TM/DC8/6xxModules/me_t2img.img",
+				"ms0:/F0/kd/resource/meimg.img","ms0:/TM/DC8/6xxModules/meimg.img",
+			}; Expand(prome_pbpname,argc(pPROME),pPROME);}
 #else
 Expand(argv[1],0,(void*)0);
 #endif

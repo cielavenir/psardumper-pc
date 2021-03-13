@@ -471,7 +471,8 @@ int Expand(char *pbp, int argc, char **argv){
 pspPSARInit(buf, g_dataOut, g_dataOut2);
 
 	
-	char *version = GetVersion((char *)g_dataOut+0x10);
+	char version[8];
+	strcpy(version, GetVersion((char *)g_dataOut+0x10));
 	printf("Version %s.\n", version);
 
 	if (memcmp(version, "3.8", 3) == 0 || memcmp(version, "3.9", 3) == 0)
@@ -520,7 +521,7 @@ pspPSARInit(buf, g_dataOut, g_dataOut2);
 		if (is5Dnum(name))
 		{
 			if (   strcmp(name, "00001") != 0 && strcmp(name, "00002") != 0 && strcmp(name, "00003") != 0 && strcmp(name, "00004") != 0 && strcmp(name, "00005") != 0
-                && strcmp(name, "00006") != 0 && strcmp(name, "00007") != 0 && strcmp(name, "00008") != 0 && strcmp(name, "00009") != 0 && strcmp(name, "00010") != 0 && strcmp(name, "00011") != 0 && strcmp(name, "00012") != 0)
+                && strcmp(name, "00006") != 0 && strcmp(name, "00007") != 0 && strcmp(name, "00008") != 0 && strcmp(name, "00009") != 0 && (strcmp(version, "6.6")<0 || (strcmp(name, "00010") != 0 && strcmp(name, "00011") != 0 && strcmp(name, "00012") != 0)))
 			{
 				int found = 0;
 				
