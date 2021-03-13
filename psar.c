@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <zlib.h>
 
+#include <stdlib.h>
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -53,12 +55,17 @@ static int _11gtable_size;
 static char _12g_table[0x4000];
 static int _12gtable_size;
 
+void kirk_init();
 int sceUtilsBufferCopyWithRange(u8* outbuff, int outsize, u8* inbuff, int insize, int cmd);
+
 int pspDecryptTable(u8 *buf1, u8 *buf2, int size, int mode);
 int pspDecryptPRX(u8 *inbuf, u8 *outbuf, u32 size);
 int pspDecryptIPL1(const u8* pbIn, u8* pbOut, int cbIn);
 int pspLinearizeIPL2(const u8* pbIn, u8* pbOut, int cbIn, u32 *startAddr);
 int pspDecryptIPL3(const u8* pbIn, u8* pbOut, int cbIn);
+int pspDecompress(const u8 *inbuf, u8 *outbuf, u32 outcapacity);
+int sceMesgd_driver_102DC8AF(u8 *inoutbuf, u32 size, int *outsize);
+int sceNwman_driver_9555D68D(u8 *inoutbuf, u32 size, int *outsize);
 
 static int OVERHEAD;
 #define SIZE_A      0x110 /* size of uncompressed file entry = 272 bytes */
@@ -232,7 +239,7 @@ int sceKernelDeflateDecompress(u8 *dest, u32 destSize, u8 *src, u32 unknown)
 	z.avail_in = PSAR_BUFFER_SIZE;
 	z.next_out = dest;
 	z.avail_out = destSize;
-	z.next_in = src;
+	z.next_in = (u8*)src;
 	ret = inflate(&z, Z_FULL_FLUSH);
 	inflateEnd(&z);
 
@@ -294,7 +301,7 @@ int pspPSARGetNextFile(u8 *dataPSAR, int cbFile, u8 *dataOut, u8 *dataOut2, char
 			u32 pbEnd;
 			
 			//insize=cbOut
-			int ret = sceKernelDeflateDecompress(dataOut2, cbExpanded, pbIn, &pbEnd);
+			int ret = sceKernelDeflateDecompress(dataOut2, cbExpanded,  (u8*)pbIn, &pbEnd);
 			
 			if (ret == cbExpanded)
 			{
@@ -1065,7 +1072,7 @@ int Expand(char *pbp, int argc, char **argv){
 						
 						if (cbExp > 0)
 						{
-							printf(",decompressed",cbExp);
+							printf(",decompressed");
 							pbToSave = g_dataOut2;
 							cbToSave = cbExp;
 						}
@@ -1123,6 +1130,6 @@ int Expand(char *pbp, int argc, char **argv){
 				//printf("\n");
 			}
 		}
-		
 	}
+	return 0;
 }
