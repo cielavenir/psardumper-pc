@@ -337,44 +337,6 @@ int main(int _, char **argv){
 			"ms0:/F0/vsh/module/pafmini.prx","ms0:/seplugins/popsloader/modules/660/pafmini.prx",
 			"ms0:/F0/vsh/module/libpspvmc.prx","ms0:/seplugins/popsloader/modules/660/libpspvmc.prx",
 		}; Expand("660-GO.PBP",argc(p660go),p660go,1);}
-	{	char *p661[]={
-			"ms0:/F0/kd/popsman.prx","ms0:/seplugins/popsloader/modules/661/popsman.prx",
-			"ms0:/F0/kd/pops.prx","ms0:/seplugins/popsloader/modules/661/pops.prx",
-			"ms0:/F0/kd/pops_01g.prx","ms0:/seplugins/popsloader/modules/661/pops_01g.prx",
-			"ms0:/F0/kd/pops_02g.prx","ms0:/seplugins/popsloader/modules/661/pops_02g.prx",
-			"ms0:/F0/kd/pops_03g.prx","ms0:/seplugins/popsloader/modules/661/pops_03g.prx",
-			"ms0:/F0/kd/pops_04g.prx","ms0:/seplugins/popsloader/modules/661/pops_04g.prx",
-			"ms0:/F0/kd/pops_05g.prx","ms0:/seplugins/popsloader/modules/661/pops_05g.prx",
-			"ms0:/F0/kd/pops_06g.prx","ms0:/seplugins/popsloader/modules/661/pops_06g.prx",
-			"ms0:/F0/kd/pops_07g.prx","ms0:/seplugins/popsloader/modules/661/pops_07g.prx",
-			"ms0:/F0/kd/pops_08g.prx","ms0:/seplugins/popsloader/modules/661/pops_08g.prx",
-			"ms0:/F0/kd/pops_09g.prx","ms0:/seplugins/popsloader/modules/661/pops_09g.prx",
-			"ms0:/F0/kd/pops_10g.prx","ms0:/seplugins/popsloader/modules/661/pops_10g.prx",
-			"ms0:/F0/kd/pops_11g.prx","ms0:/seplugins/popsloader/modules/661/pops_11g.prx",
-			"ms0:/F0/kd/pops_12g.prx","ms0:/seplugins/popsloader/modules/661/pops_12g.prx",
-			"ms0:/F0/vsh/module/common_util.prx","ms0:/seplugins/popsloader/modules/661/common_util.prx",
-			"ms0:/F0/vsh/module/pafmini.prx","ms0:/seplugins/popsloader/modules/661/pafmini.prx",
-			"ms0:/F0/vsh/module/libpspvmc.prx","ms0:/seplugins/popsloader/modules/661/libpspvmc.prx",
-		}; Expand("661.PBP",argc(p661),p661,1);}
-	{	char *p661go[]={
-			"ms0:/F0/kd/popsman.prx","ms0:/seplugins/popsloader/modules/661/popsman.prx",
-			"ms0:/F0/kd/pops.prx","ms0:/seplugins/popsloader/modules/661/pops.prx",
-			"ms0:/F0/kd/pops_01g.prx","ms0:/seplugins/popsloader/modules/661/pops_01g.prx",
-			"ms0:/F0/kd/pops_02g.prx","ms0:/seplugins/popsloader/modules/661/pops_02g.prx",
-			"ms0:/F0/kd/pops_03g.prx","ms0:/seplugins/popsloader/modules/661/pops_03g.prx",
-			"ms0:/F0/kd/pops_04g.prx","ms0:/seplugins/popsloader/modules/661/pops_04g.prx",
-			"ms0:/F0/kd/pops_05g.prx","ms0:/seplugins/popsloader/modules/661/pops_05g.prx",
-			"ms0:/F0/kd/pops_06g.prx","ms0:/seplugins/popsloader/modules/661/pops_06g.prx",
-			"ms0:/F0/kd/pops_07g.prx","ms0:/seplugins/popsloader/modules/661/pops_07g.prx",
-			"ms0:/F0/kd/pops_08g.prx","ms0:/seplugins/popsloader/modules/661/pops_08g.prx",
-			"ms0:/F0/kd/pops_09g.prx","ms0:/seplugins/popsloader/modules/661/pops_09g.prx",
-			"ms0:/F0/kd/pops_10g.prx","ms0:/seplugins/popsloader/modules/661/pops_10g.prx",
-			"ms0:/F0/kd/pops_11g.prx","ms0:/seplugins/popsloader/modules/661/pops_11g.prx",
-			"ms0:/F0/kd/pops_12g.prx","ms0:/seplugins/popsloader/modules/661/pops_12g.prx",
-			"ms0:/F0/vsh/module/common_util.prx","ms0:/seplugins/popsloader/modules/661/common_util.prx",
-			"ms0:/F0/vsh/module/pafmini.prx","ms0:/seplugins/popsloader/modules/661/pafmini.prx",
-			"ms0:/F0/vsh/module/libpspvmc.prx","ms0:/seplugins/popsloader/modules/661/libpspvmc.prx",
-		}; Expand("661-GO.PBP",argc(p661go),p661go,1);}
 #elif defined(DC8EX)
 		//const char *music_pbpname="550.PBP";
 		const char *music_pbpname="551.PBP";
