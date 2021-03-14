@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include <zlib.h>
+#include "zlib/zlib.h"
 
 #include <stdlib.h>
 
