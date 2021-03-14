@@ -1,4 +1,4 @@
-## PSARDumper PC
+## PSARDumper on PC / PopsDeco on PC
 
 - found sceMesgd\_driver\_102DC8AF implementation in https://github.com/jpcsp/jpcsp/commit/578600cfb9755179d9a3e40feab9f6e2dba92df0
 - found kl4e implementation in https://github.com/jpcsp/jpcsp/blob/master/src/jpcsp/format/KL4E.java
